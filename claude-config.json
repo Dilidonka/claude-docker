@@ -1,0 +1,58 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "node",
+      "args": [
+        "/home/developer/mcp-servers/sequential-thinking/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
+      ],
+      "description": "Sequential thinking MCP server for structured reasoning"
+    },
+    "mysql": {
+      "command": "uvx",
+      "args": [
+        "mysql_mcp_server"
+      ],
+      "env": {
+        "MYSQL_HOST": "${MYSQL_HOST}",
+        "MYSQL_PORT": "${MYSQL_PORT}",
+        "MYSQL_USER": "${MYSQL_USER}",
+        "MYSQL_PASSWORD": "${MYSQL_PASSWORD}",
+        "MYSQL_DATABASE": "${MYSQL_DATABASE}"
+      },
+      "description": "MySQL MCP server for database operations"
+    },
+    "context7": {
+      "command": "node",
+      "args": [
+        "/home/developer/mcp-servers/context7-mcp/node_modules/@upstash/context7-mcp/dist/index.js"
+      ],
+      "env": {
+        "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
+        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}"
+      },
+      "description": "Upstash Context7 MCP server for context management"
+    },
+    "filesystem": {
+      "command": "node",
+      "args": [
+        "/home/developer/mcp-servers/filesystem/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "/home/developer/workspace"
+      ],
+      "description": "Filesystem MCP server for file operations"
+    },
+    "github": {
+      "command": "node",
+      "args": [
+        "/home/developer/mcp-servers/github/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "description": "GitHub MCP server for repository operations"
+    }
+  },
+  "settings": {
+    "autoUpdate": false,
+    "telemetry": false
+  }
+}

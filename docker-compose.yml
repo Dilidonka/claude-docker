@@ -1,0 +1,36 @@
+services:
+  claude-code:
+    build:
+      context: .
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    image: claude-code:latest
+    container_name: claude-code-dev
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mount the directory from where the script is called
+      - ${WORKSPACE_DIR}:/home/developer/workspace
+      # Persist entire .config directory (includes Claude Code config and auth)
+      - claude-config:/home/developer/.config
+      # Persist npm global packages
+      - npm-global:/home/developer/.npm-global
+      # Persist bash history
+      - bash-history:/home/developer/.bash_history_docker
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST:-localhost}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_USER=${MYSQL_USER:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - UPSTASH_REDIS_URL=${UPSTASH_REDIS_URL}
+      - UPSTASH_REDIS_TOKEN=${UPSTASH_REDIS_TOKEN}
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+    working_dir: /home/developer/workspace
+    network_mode: host
+
+volumes:
+  claude-config:
+  npm-global:
+  bash-history:

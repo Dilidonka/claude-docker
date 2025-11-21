@@ -13,7 +13,12 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Default values
-WORKSPACE_DIR="${WORKSPACE_DIR:-$(pwd)}"
+# Set WORKSPACE_DIR to current directory if not set or empty
+if [ -z "$WORKSPACE_DIR" ]; then
+    WORKSPACE_DIR="$(pwd)"
+fi
+export WORKSPACE_DIR
+
 IMAGE_NAME="claude-code:latest"
 CONTAINER_NAME="claude-code-dev"
 

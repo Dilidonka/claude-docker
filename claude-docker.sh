@@ -83,8 +83,16 @@ build_image() {
     cd "$SCRIPT_DIR"
 
     # Export user/group IDs
-    export USER_ID=$(id -u)
-    export GROUP_ID=$(id -g)
+    # If running as root (ID 0), use 1000 as default instead
+    if [ "$(id -u)" -eq 0 ]; then
+        export USER_ID=${USER_ID:-1000}
+        export GROUP_ID=${GROUP_ID:-1000}
+        print_warning "Running as root. Using USER_ID=${USER_ID} GROUP_ID=${GROUP_ID}"
+        print_info "To use different IDs, set USER_ID and GROUP_ID environment variables"
+    else
+        export USER_ID=$(id -u)
+        export GROUP_ID=$(id -g)
+    fi
 
     # Set WORKSPACE_DIR if not already set (use current directory)
     if [ -z "$WORKSPACE_DIR" ]; then
@@ -104,8 +112,14 @@ start_container() {
     cd "$SCRIPT_DIR"
 
     # Export environment variables
-    export USER_ID=$(id -u)
-    export GROUP_ID=$(id -g)
+    # If running as root (ID 0), use 1000 as default instead
+    if [ "$(id -u)" -eq 0 ]; then
+        export USER_ID=${USER_ID:-1000}
+        export GROUP_ID=${GROUP_ID:-1000}
+    else
+        export USER_ID=$(id -u)
+        export GROUP_ID=$(id -g)
+    fi
 
     # Set WORKSPACE_DIR if not already set
     if [ -z "$WORKSPACE_DIR" ]; then
@@ -144,8 +158,14 @@ stop_container() {
     cd "$SCRIPT_DIR"
 
     # Export environment variables
-    export USER_ID=$(id -u)
-    export GROUP_ID=$(id -g)
+    # If running as root (ID 0), use 1000 as default instead
+    if [ "$(id -u)" -eq 0 ]; then
+        export USER_ID=${USER_ID:-1000}
+        export GROUP_ID=${GROUP_ID:-1000}
+    else
+        export USER_ID=$(id -u)
+        export GROUP_ID=$(id -g)
+    fi
 
     # Set WORKSPACE_DIR if not already set (use current directory)
     if [ -z "$WORKSPACE_DIR" ]; then
@@ -241,8 +261,14 @@ show_logs() {
     cd "$SCRIPT_DIR"
 
     # Export environment variables
-    export USER_ID=$(id -u)
-    export GROUP_ID=$(id -g)
+    # If running as root (ID 0), use 1000 as default instead
+    if [ "$(id -u)" -eq 0 ]; then
+        export USER_ID=${USER_ID:-1000}
+        export GROUP_ID=${GROUP_ID:-1000}
+    else
+        export USER_ID=$(id -u)
+        export GROUP_ID=$(id -g)
+    fi
 
     # Set WORKSPACE_DIR if not already set (use current directory)
     if [ -z "$WORKSPACE_DIR" ]; then

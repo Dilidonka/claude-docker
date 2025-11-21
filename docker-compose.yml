@@ -27,6 +27,11 @@ services:
       # Persist bash history
       - bash-history:/home/developer/.bash_history_docker
     environment:
+      # Terminal and color support
+      - TERM=xterm-256color
+      - COLORTERM=truecolor
+      - FORCE_COLOR=1
+      # MCP and service credentials
       - MYSQL_HOST=${MYSQL_HOST:-localhost}
       - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_USER=${MYSQL_USER:-root}

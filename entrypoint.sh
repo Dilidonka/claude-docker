@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Set proper terminal environment for colors
+export TERM="${TERM:-xterm-256color}"
+export COLORTERM="truecolor"
+export FORCE_COLOR="1"
+
 # Ensure config directory exists
 mkdir -p /home/developer/.config/claude-code
 

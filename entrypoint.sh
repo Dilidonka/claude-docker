@@ -11,5 +11,22 @@ if [ ! -f /home/developer/.config/claude-code/config.json ]; then
     fi
 fi
 
+# Fix permissions for Claude directories (volumes may be owned by root)
+mkdir -p /home/developer/.claude \
+         /home/developer/.claude-data \
+         /home/developer/.config \
+         /home/developer/.cache \
+         /home/developer/.local
+
+# Set correct ownership for all persistent directories (using sudo since we're developer user)
+sudo chown -R developer:developer /home/developer/.claude \
+                                  /home/developer/.claude-data \
+                                  /home/developer/.config \
+                                  /home/developer/.cache \
+                                  /home/developer/.local 2>/dev/null || true
+
+# Start Claude data persistence script in background
+/home/developer/persist-claude-data.sh &
+
 # Execute the command passed to the container
 exec "$@"

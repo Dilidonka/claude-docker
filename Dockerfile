@@ -16,6 +16,10 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install uv (Python package manager) for MySQL MCP server
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.cargo/bin/* /usr/local/bin/ 2>/dev/null || true
+
 # ============================================
 # LAYER 2: User setup (rarely changes)
 # ============================================
@@ -48,9 +52,11 @@ RUN mkdir -p /home/developer/.config/claude-code \
 COPY --chown=developer:developer install-mcp-servers.sh /home/developer/
 COPY --chown=developer:developer update-claude.sh /home/developer/
 COPY --chown=developer:developer install-packages.sh /home/developer/
+COPY --chown=developer:developer persist-claude-data.sh /home/developer/
 RUN chmod +x /home/developer/install-mcp-servers.sh \
     /home/developer/update-claude.sh \
-    /home/developer/install-packages.sh
+    /home/developer/install-packages.sh \
+    /home/developer/persist-claude-data.sh
 
 # Copy Claude Code configuration template
 COPY --chown=developer:developer claude-config.json /home/developer/claude-config-template.json
@@ -72,5 +78,5 @@ WORKDIR /home/developer/workspace
 # Use entrypoint to initialize config on first run
 ENTRYPOINT ["/home/developer/entrypoint.sh"]
 
-# Automatically start Claude Code
-CMD ["bash", "-c", "cd /home/developer/workspace && claude"]
+# Keep container running with bash (Claude Code will be launched via docker exec)
+CMD ["/bin/bash"]

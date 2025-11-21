@@ -66,9 +66,7 @@ UPSTASH_REDIS_TOKEN=
 # GitHub Configuration (Optional - for GitHub MCP server)
 GITHUB_PERSONAL_ACCESS_TOKEN=
 
-# User ID and Group ID (automatically detected)
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
+# Note: USER_ID, GROUP_ID, and WORKSPACE_DIR are automatically set by the script
 EOF
         print_success ".env file created successfully"
     fi
@@ -79,17 +77,17 @@ build_image() {
     print_info "Building Docker image..."
     cd "$SCRIPT_DIR"
 
-    # Export user/group IDs and workspace
+    # Export user/group IDs
     export USER_ID=$(id -u)
     export GROUP_ID=$(id -g)
-    export WORKSPACE_DIR="$WORKSPACE_DIR"
 
-    # Load .env file if exists
-    if [ -f "$SCRIPT_DIR/.env" ]; then
-        set -a
-        source "$SCRIPT_DIR/.env"
-        set +a
+    # Set WORKSPACE_DIR if not already set (use current directory)
+    if [ -z "$WORKSPACE_DIR" ]; then
+        export WORKSPACE_DIR="$(pwd)"
     fi
+
+    # Ensure variables are exported for docker-compose
+    export USER_ID GROUP_ID WORKSPACE_DIR
 
     docker-compose build
     print_success "Docker image built successfully"
@@ -103,17 +101,16 @@ start_container() {
     # Export environment variables
     export USER_ID=$(id -u)
     export GROUP_ID=$(id -g)
-    export WORKSPACE_DIR="$WORKSPACE_DIR"
 
-    # Load .env file
-    set -a
-    source "$SCRIPT_DIR/.env"
-    set +a
+    # Set WORKSPACE_DIR if not already set
+    if [ -z "$WORKSPACE_DIR" ]; then
+        export WORKSPACE_DIR="$(pwd)"
+    fi
 
     # Check if container is already running
     if docker ps -q -f name="$CONTAINER_NAME" | grep -q .; then
-        print_warning "Container is already running. Attaching to Claude Code..."
-        docker attach "$CONTAINER_NAME"
+        print_warning "Container is already running. Launching Claude Code..."
+        docker exec -it "$CONTAINER_NAME" bash -c "cd /home/developer/workspace && claude"
     else
         # Remove old container if exists
         if docker ps -a -q -f name="$CONTAINER_NAME" | grep -q .; then
@@ -121,9 +118,18 @@ start_container() {
             docker rm "$CONTAINER_NAME" > /dev/null 2>&1
         fi
 
-        # Start new container with Claude Code
-        print_info "Starting container with Claude Code..."
-        docker-compose up
+        # Start container in background
+        print_info "Starting container..."
+        # Ensure environment variables are exported for docker-compose
+        export USER_ID GROUP_ID WORKSPACE_DIR
+        docker-compose up -d
+
+        # Wait for container to be ready
+        sleep 2
+
+        # Launch Claude Code interactively
+        print_info "Launching Claude Code..."
+        docker exec -it "$CONTAINER_NAME" bash -c "cd /home/developer/workspace && claude"
     fi
 }
 
@@ -131,6 +137,19 @@ start_container() {
 stop_container() {
     print_info "Stopping Claude Code container..."
     cd "$SCRIPT_DIR"
+
+    # Export environment variables
+    export USER_ID=$(id -u)
+    export GROUP_ID=$(id -g)
+
+    # Set WORKSPACE_DIR if not already set (use current directory)
+    if [ -z "$WORKSPACE_DIR" ]; then
+        export WORKSPACE_DIR="$(pwd)"
+    fi
+
+    # Ensure variables are exported for docker-compose
+    export USER_ID GROUP_ID WORKSPACE_DIR
+
     docker-compose down
     print_success "Container stopped"
 }
@@ -215,6 +234,19 @@ update() {
 # Function to show logs
 show_logs() {
     cd "$SCRIPT_DIR"
+
+    # Export environment variables
+    export USER_ID=$(id -u)
+    export GROUP_ID=$(id -g)
+
+    # Set WORKSPACE_DIR if not already set (use current directory)
+    if [ -z "$WORKSPACE_DIR" ]; then
+        export WORKSPACE_DIR="$(pwd)"
+    fi
+
+    # Ensure variables are exported for docker-compose
+    export USER_ID GROUP_ID WORKSPACE_DIR
+
     docker-compose logs -f
 }
 

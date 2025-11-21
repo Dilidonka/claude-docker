@@ -12,8 +12,16 @@ services:
     volumes:
       # Mount the directory from where the script is called
       - ${WORKSPACE_DIR}:/home/developer/workspace
+      # Persist Claude Code authentication files
+      - claude-auth:/home/developer/.claude
+      # Persist Claude JSON data files
+      - claude-data:/home/developer/.claude-data
       # Persist entire .config directory (includes Claude Code config and auth)
       - claude-config:/home/developer/.config
+      # Persist .cache directory (Claude Code may store session data here)
+      - claude-cache:/home/developer/.cache
+      # Persist .local directory (Claude Code may store data here)
+      - claude-local:/home/developer/.local
       # Persist npm global packages
       - npm-global:/home/developer/.npm-global
       # Persist bash history
@@ -28,9 +36,13 @@ services:
       - UPSTASH_REDIS_TOKEN=${UPSTASH_REDIS_TOKEN}
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
     working_dir: /home/developer/workspace
-    network_mode: host
+    network_mode: host 
 
 volumes:
+  claude-auth:
+  claude-data:
   claude-config:
+  claude-cache:
+  claude-local:
   npm-global:
   bash-history:

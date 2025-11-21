@@ -18,7 +18,9 @@ RUN apt-get update && apt-get install -y \
 
 # Install uv (Python package manager) for MySQL MCP server
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.cargo/bin/* /usr/local/bin/ 2>/dev/null || true
+    cp /root/.local/bin/uv /usr/local/bin/ && \
+    cp /root/.local/bin/uvx /usr/local/bin/ && \
+    chmod 755 /usr/local/bin/uv /usr/local/bin/uvx
 
 # ============================================
 # LAYER 2: User setup (rarely changes)
